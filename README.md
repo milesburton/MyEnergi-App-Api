@@ -13,22 +13,22 @@ Charles Proxy is used as an SSL proxy between the app and the Myenergi server en
 
 ## Findings
 
-The app makes https requests to the myenergi.net host using Digest Authentication (https://en.wikipedia.org/wiki/Digest_access_authentication) using the qop directive as "auth"
+The app makes https requests to the s8.myenergi.net host using Digest Authentication (https://en.wikipedia.org/wiki/Digest_access_authentication) using the qop directive as "auth"
 
-An initial request is made to https://myenergi.net/cgi-jstatus-E the server responds with a status 401 Unauthorized and requests authentication returning the realm: "MyEnergi Telemetry", qop: "auth", an initial nonce, a Stale flag, and algorithm: "MD5"
+An initial request is made to https://s8.myenergi.net/cgi-jstatus-E the server responds with a status 401 Unauthorized and requests authentication returning the realm: "MyEnergi Telemetry", qop: "auth", an initial nonce, a Stale flag, and algorithm: "MD5"
 
 To authenticate, pass the Myenergi hub's serial number as the username, and the password setup in the app as the password.
 
-A json response to the inital request to https://myenergi.net/cgi-jstatus-E can be obtained through a browser using the hub serial number and app password when requested for credentials.
+A json response to the inital request to https://s8.myenergi.net/cgi-jstatus-E can be obtained through a browser using the hub serial number and app password when requested for credentials.
 
 A simple curl command will do the same:
 
-`curl --digest -u **HUB**:**PASSWORD** -H 'accept: application/json' -H 'content-type: application/json'  --compressed 'https://myenergi.net/cgi-jstatus-E'`
+`curl --digest -u **HUB**:**PASSWORD** -H 'accept: application/json' -H 'content-type: application/json'  --compressed 'https://s8.myenergi.net/cgi-jstatus-E'`
 
 
 ## Status Messages
 
-https://myenergi.net/cgi-jstatus-E
+https://s8.myenergi.net/cgi-jstatus-E
 
 The server responds with a json object:
 
@@ -66,7 +66,7 @@ The server responds with a json object:
 
 This gives us the basic data used on the app's main screen.   The app also makes calls to 
 
-  * https://myenergi.net/cgi-jstatus-Z  (For Zappi data)
+  * https://s8.myenergi.net/cgi-jstatus-Z  (For Zappi data)
   
 ```json
 {
@@ -95,7 +95,7 @@ This gives us the basic data used on the app's main screen.   The app also makes
 	}]
 }
 ```
-  * https://myenergi.net/cgi-jstatus-H  (For Harvi data) - I do have a harvi, but removed it from my installation and ran cat5 to the zappi.
+  * https://s8.myenergi.net/cgi-jstatus-H  (For Harvi data) - I do have a harvi, but removed it from my installation and ran cat5 to the zappi.
   
 ```json
 {
@@ -118,7 +118,7 @@ This gives us the basic data used on the app's main screen.   The app also makes
 
 In addition to these status requests, the App also makes repeated calls to 
 
-`https://myenergi.net/cgi-set-heater-priority-E10088888  `
+`https://s8.myenergi.net/cgi-set-heater-priority-E10088888  `
 
 **Note - the last 8 digits of the request are my Eddi Serial Number - which can be found in the data returned from the call to cgi-jstatus-E**  
 
@@ -137,7 +137,7 @@ Tapping the Zappi or Eddi icon on the main screen causes the app to call new end
 
 ### Eddi
 
-`https://myenergi.net/cgi-jstatus-E10088888`
+`https://s8.myenergi.net/cgi-jstatus-E10088888`
 
 ```json
 {
@@ -173,7 +173,7 @@ Tapping the Zappi or Eddi icon on the main screen causes the app to call new end
 
 ### Zappi
 
-`https://myenergi.net/cgi-jstatus-Z10077777`
+`https://s8.myenergi.net/cgi-jstatus-Z10077777`
 
 ```json
 {
@@ -205,7 +205,7 @@ Tapping the Zappi or Eddi icon on the main screen causes the app to call new end
 
 ### Eddi Boost Time
 
-`https://myenergi.net/cgi-boost-time-E10088888`
+`https://s8.myenergi.net/cgi-boost-time-E10088888`
 
 ```json
 {
@@ -274,7 +274,7 @@ Tapping the Zappi or Eddi icon on the main screen causes the app to call new end
 #### Minute by Minute
 
 ##### Eddi
-`https://myenergi.net/cgi-jday-E10088888-2019-6-7`
+`https://s8.myenergi.net/cgi-jday-E10088888-2019-6-7`
 
 **Response truncated**
 
@@ -351,7 +351,7 @@ Data from later in the array as an example.
 
 ##### Zappi
 
-`https://myenergi.net/cgi-jday-Z10077777-2019-6-7`
+`https://s8.myenergi.net/cgi-jday-Z10077777-2019-6-7`
 
 Currently returns no data - perhaps due to the pending firmware update for the zappi, or due to me not charging
 ```json
@@ -364,7 +364,7 @@ Currently returns no data - perhaps due to the pending firmware update for the z
 
 ##### Eddie
 
-`https://myenergi.net/cgi-jdayhour-E10088888-2019-6-7`
+`https://s8.myenergi.net/cgi-jdayhour-E10088888-2019-6-7`
 
 ```json
 {
@@ -468,7 +468,7 @@ Note missing hr property for first object in array
 
 ##### Zappi
 
-`https://myenergi.net/cgi-jdayhour-Z10077777-2019-6-6`
+`https://s8.myenergi.net/cgi-jdayhour-Z10077777-2019-6-6`
 
 ```json
 {
@@ -486,13 +486,13 @@ No data.
 To change the Zappi mode between Fast, Eco, Eco+  call these endpoints.   Serial numbers are included in the URL - be sure to replace 10077777 with your Zappi Serial Number
 
 #### Fast
-`https://myenergi.net/cgi-zappi-mode-Z10077777-1-0-0-0000`
+`https://s8.myenergi.net/cgi-zappi-mode-Z10077777-1-0-0-0000`
 
 #### Eco
-`https://myenergi.net/cgi-zappi-mode-Z10077777-2-0-0-0000`
+`https://s8.myenergi.net/cgi-zappi-mode-Z10077777-2-0-0-0000`
 
 #### Eco+
-`https://myenergi.net/cgi-zappi-mode-Z10077777-3-0-0-0000`
+`https://s8.myenergi.net/cgi-zappi-mode-Z10077777-3-0-0-0000`
 
 All requests return this
 ```json
@@ -508,13 +508,13 @@ All requests return this
 Eddi can be set to boost - Example endpoints.  Serial numbers are included in the URL - be sure to replace 10088888 with your Eddi Serial Number
 
 #### 20 minute manual boost
-`https://myenergi.net/cgi-eddi-boost-E10088888-10-1-20`
+`https://s8.myenergi.net/cgi-eddi-boost-E10088888-10-1-20`
 
 #### 60 minute manual boost
-`https://myenergi.net/cgi-eddi-boost-E10088888-10-1-60`
+`https://s8.myenergi.net/cgi-eddi-boost-E10088888-10-1-60`
 
 #### Cancel boost
-`https://myenergi.net/cgi-eddi-boost-E10088888-1-1-0`
+`https://s8.myenergi.net/cgi-eddi-boost-E10088888-1-1-0`
 
 All requests return this
 ```json
