@@ -5,6 +5,13 @@ Myenergi have released a mobile app to view and control their Zappi and Eddi pro
 
 This repository will be used to document my investigation into the API the app is using, so that the data and calls may be used in my own Home Automation system.
 
+With thanks to members of the myenergi.info forum:
+  * sashton
+  * fintan.farrell
+  * MilesB
+
+who have contributed updates, and to the folks at MyEnergi who haven't officialy sanctioned this investigation but havent asked us to stop either.
+
 ## Tools Used
   * Myenergi iOS app  (http://myenergi.info)
   * Charles Proxy (https://www.charlesproxy.com)
@@ -35,31 +42,31 @@ The server responds with a json object:
 ```json
 {
 	"eddi": [{
-		"dat": "07-06-2019",
-		"tim": "07:28:45",
-		"div": 928,
-		"ectp1": -7,
-		"ectp2": 6,
-		"ectt1": "Grid",
-		"ectt2": "Generation",
-		"frq": 50.07,
-		"gen": 2054,
-		"grd": 969,
+		"dat": "07-06-2019",		//date
+		"tim": "07:28:45",		//time
+		"div": 928,			//Diversion amount Watts (does not appear if zero)
+		"ectp1": -7,			//physical CT connection 1 value
+		"ectp2": 6,			//physical CT connection 2 value
+		"ectt1": "Grid",		//CT 1 name
+		"ectt2": "Generation",		//CT 2 name
+		"frq": 50.07,			//Supply Frequency
+		"gen": 2054,			//Generated Watts
+		"grd": 969,			//Watts from Grid?
 		"hno": 1,
-		"pha": 3,
-		"sno": 10088888,      //Changed Eddi Serial Number
-		"sta": 3,
+		"pha": 3,			//phase?
+		"sno": 10088888,      	//Changed Eddi Serial Number
+		"sta": 3,                       //Status 1=Paused, 3=Diverting, 5=Stopped/Max Temp Reached			
 		"vol": 4.1,
-		"ht1": "Tank 1",
-		"ht2": "Tank 2",
+		"ht1": "Tank 1",		//Heater 1 name
+		"ht2": "Tank 2",		//Heater 2 name
 		"tp1": -1,
 		"tp2": -1,
-		"pri": 2,
+		"pri": 2,			//priority>
 		"cmt": 254,
 		"r1a": 1,
 		"r2a": 1,
 		"r2b": 1,
-		"che": 1
+		"che": 1			//charge added in KWH
 	}]
 }
 ```
@@ -71,27 +78,32 @@ This gives us the basic data used on the app's main screen.   The app also makes
 ```json
 {
 	"zappi": [{
-		"dat": "07-06-2019",
-		"tim": "07:28:46",
-		"div": 1376,
-		"ectp1": 920,
-		"ectp2": 2143,
-		"ectt1": "Grid",
-		"ectt2": "Generation",
-		"frq": 49.95,
-		"gen": 2143,
-		"grd": 1017,
+		"dat": "07-06-2019",		//Date
+		"tim": "07:28:46",		//Time
+		"div": 1376,			//Diversion amount Watts (does not appear if zero)
+		"ectp1": 920,			//Physical CT connection 1 value Watts
+		"ectp2": 2143,			//Physical CT connection 2 value Watts
+		"ectt1": "Grid",		//CT 1 Name
+		"ectt2": "Generation",		//CT 2 Name
+		"frq": 49.95,			//Supply Frequency
+		"gen": 2143,			//Generated Watts
+		"grd": 1017,			//Watts from grid?
 		"pha": 1,
 		"sno": 10077777,        //Changed Zappi Serial Number
-		"sta": 3,
-		"vol": 244.4,
-		"pri": 1,
+		"sta": 3,                       //Status  1=Paused 3=Diverting/Charging 5=Complete
+		"vol": 244.4,			//Supply voltage
+		"pri": 1,			//priority
 		"cmt": 253,
-		"tbh": 9,
-		"tbm": 15,
-		"tbk": 90,
-		"pst": "A",
-		"mgl": 100
+		"tbh": 9,			//boost hour?
+		"tbm": 15,			//boost minute?
+		"tbk": 90,			//boost KWh   - Note charge remaining for boost = tbk-che
+		"pst": "A",			//Status A=Disconnected, B1=Awaiting Surplus, B2=Charge Complete, C1= Transitory- unknown, C2= Charge Complete
+		"mgl": 100,
+		"zmo": 3,			//Zappi Mode - 1=Fast, 2=Eco, 3=Eco+
+		"che": 1,			//Charge added in KWh
+		"sbh": 14,			//Smart Boost Start Time Hour
+		"sbm": 15,			//Smart Boost Start Time Minute
+		"sbk": 5			//Smart Boost KWh to add
 	}]
 }
 ```
@@ -268,6 +280,42 @@ Tapping the Zappi or Eddi icon on the main screen causes the app to call new end
 	}]
 }
 ```
+### Zappi Boost Times
+
+`https://s8.myenergi.net/cgi-boost-time-Z10077777`
+```json
+{
+	"boost_times": [{
+		"slt": 11,		//Slot
+		"bsh": 14,		//boost start hour
+		"bsm": 0,		//boost start minute
+		"bdh": 0,		//boost duration hour
+		"bdm": 15,		//boost duration minute
+		"bdd": "01111111"	//boost days of week Monday through Sunday
+	}, {
+		"slt": 12,
+		"bsh": 14,
+		"bsm": 0,
+		"bdh": 0,
+		"bdm": 0,
+		"bdd": "00000000"
+	}, {
+		"slt": 13,
+		"bsh": 0,
+		"bsm": 0,
+		"bdh": 0,
+		"bdm": 0,
+		"bdd": "00000000"
+	}, {
+		"slt": 14,
+		"bsh": 0,
+		"bsm": 0,
+		"bdh": 0,
+		"bdm": 0,
+		"bdd": "00000000"
+	}]
+}
+```
 
 ### Historic Data
 
@@ -351,13 +399,35 @@ Data from later in the array as an example.
 
 ##### Zappi
 
-`https://s8.myenergi.net/cgi-jday-Z10077777-2019-6-7`
+`https://s8.myenergi.net/cgi-jday-Z10077777-2019-6-8`
 
-Currently returns no data - perhaps due to the pending firmware update for the zappi, or due to me not charging
+**response truncated**
+
 ```json
 {
-	"U10077777": []
-}
+	"U10077777": [{
+		"dow": "Sat",
+		"dom": 8,
+		"mon": 6,
+		"yr": 2019,
+		"imp": 42900,
+		"gen": 180,
+		"v1": 2448,
+		"frq": 5007,
+		"nect1": 42900
+	}, {
+		"min": 1,
+		"dow": "Sat",
+		"dom": 8,
+		"mon": 6,
+		"yr": 2019,
+		"imp": 42900,
+		"gen": 180,
+		"v1": 2446,
+		"frq": 5006,
+		"nect1": 42900
+	}, 
+...
 ```
 
 ####  Hourly
@@ -494,6 +564,19 @@ To change the Zappi mode between Fast, Eco, Eco+  call these endpoints.   Serial
 #### Eco+
 `https://s8.myenergi.net/cgi-zappi-mode-Z10077777-3-0-0-0000`
 
+#### Boost 5KWh
+`https://s8.myenergi.net/cgi-zappi-mode-Z10077777-0-10-5-0000`
+
+where 0 is Boost - 10 is Boost Mode - 5 is the KWh to add
+
+#### Smart Boost 5KWh - complete by 2pm
+`https://s8.myenergi.net/cgi-zappi-mode-Z10077777-0-11-5-1400`  
+
+where 0 is Boost - 11 is Smart Boost Mode - 5 is the KWh to add, 1400 is the time the boost should complete.
+
+#### Stop Boost
+`https://s8.myenergi.net/cgi-zappi-mode-Z10077777-0-2-0-0000`
+
 All requests return this
 ```json
 {
@@ -501,6 +584,25 @@ All requests return this
 	"statustext": ""
 }
 ```
+
+#### Minimum Green Level 60%
+`https://s8.myenergi.net/cgi-set-min-green-Z10077777-60`
+returns
+```json
+{
+	"mgl": 60
+}
+```
+
+#### Minimum Green Level 100%
+`https://s8.myenergi.net/cgi-set-min-green-Z10077777-100`
+returns
+```json
+{
+	"mgl": 100
+}
+```
+
 
 
 ### Eddi
@@ -524,13 +626,11 @@ All requests return this
 }
 ```
 
-
 ## Still to come... 
 
   *  Understanding of response properties
   *  Zappi manual / smart / timed boosts - will need to wait for new firmware as App shows car not connected, and will not allow manipulation.
-  *  Eddei timed boost
+  *  Eddi timed boost
   
   
-
 
